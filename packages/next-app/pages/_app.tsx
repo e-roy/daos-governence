@@ -1,18 +1,15 @@
 import "../styles/globals.css";
-import * as React from "react";
 import type { AppProps } from "next/app";
-import { providers } from "ethers";
-
-// Imports
-import { AppLayout } from "@/components/layout";
 import { Connector, Provider, chain, defaultChains } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import { WalletLinkConnector } from "wagmi/connectors/walletLink";
+import { providers } from "ethers";
+
+import { AppLayout } from "@/components/layout";
 
 // Get environment variables
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID as string;
-const etherscanApiKey = process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY as string;
 const infuraId = process.env.NEXT_PUBLIC_INFURA_ID as string;
 
 // Pick chains
@@ -54,7 +51,6 @@ const provider = ({ chainId }: ProviderConfig) =>
     isChainSupported(chainId) ? chainId : defaultChain.id,
     {
       alchemy: alchemyId,
-      etherscan: etherscanApiKey,
       infura: infuraId,
     }
   );
@@ -63,7 +59,7 @@ const webSocketProvider = ({ chainId }: ProviderConfig) =>
     ? new providers.InfuraWebSocketProvider(chainId, infuraId)
     : undefined;
 
-const App = ({ Component, pageProps }: AppProps) => {
+const App = ({ Component, pageProps }) => {
   return (
     <Provider
       autoConnect
