@@ -3,14 +3,14 @@ pragma solidity ^0.8.10;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 import "./IGovernance.sol";
 
 contract Governance is ERC721URIStorage {
     IGovernance governance;
 
-    string public _name;
+    address public _owner;
     string public _content;
+    string public _doaAddress;
 
         // Create a struct named Proposal containing all relevant information
     struct Proposal {
@@ -40,12 +40,13 @@ contract Governance is ERC721URIStorage {
     uint256 public numProposals;
 
     constructor(
-        string memory _name,
-        address _owner,
-        string memory content
-    ) ERC721(_name, "THING") {
+        address owner,
+        string memory content,
+        string memory doaAddress
+    ) ERC721("DAO Governance", "DAO") {
+        _owner = owner;
         _content = content;
-
+        _doaAddress = doaAddress;
     }
 
  
@@ -137,6 +138,8 @@ contract Governance is ERC721URIStorage {
         }
     }
 
-
+    function getContent() public view returns(string memory) {
+        return _content;
+    } 
 
 }

@@ -4,8 +4,9 @@ pragma solidity ^0.8.10;
 import "./Governance.sol";
 
 contract GovernanceFactory {
-    string public name;
-    string private contractAddress;
+    // string public name;
+    // string private contractAddress;
+
 
     struct GovernanceStruct {
         // foundation id
@@ -14,6 +15,8 @@ contract GovernanceFactory {
         address _owner;
         // contract address created
         address _contract;
+        // doa address
+        string _doaAddress;
     }
  
 
@@ -22,13 +25,13 @@ contract GovernanceFactory {
     uint256 public numGovernances;
 
 
-    function createGovernance(string memory name, string memory content) public {
+    function createGovernance(string memory content, string memory doaAddress) public {
         Governance governance = new Governance(
-            name,
             msg.sender,
-            content
+            content,
+            doaAddress
         );
-        allGovernance[numGovernances] = (GovernanceStruct(numGovernances, msg.sender, address(governance)));
+        allGovernance[numGovernances] = (GovernanceStruct(numGovernances, msg.sender, address(governance), doaAddress));
         numGovernances++;
     }
 

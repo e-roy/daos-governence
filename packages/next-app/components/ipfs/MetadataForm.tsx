@@ -1,13 +1,19 @@
 import { useState } from "react";
 import { uploadIpfs } from "@/lib/ipfs/ipfs";
+import { Button } from "@/components/elements";
 
-export const MetadataForm = () => {
+type MetadataFormProps = {
+  onSubmit: (metadata: any) => void;
+  buttonName: string;
+};
+
+export const MetadataForm = ({ onSubmit, buttonName }: MetadataFormProps) => {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [content, setContent] = useState<string>("");
+
   const handleForm = async (e) => {
     e.preventDefault();
-    console.log("handle form");
     let media = [] as any[];
     // if (selectedPicture) {
     //   media = [
@@ -24,12 +30,13 @@ export const MetadataForm = () => {
       media: media,
     };
     const result = await uploadIpfs({ payload });
-    console.log(result);
+    // console.log(result);
     const link = `https://ipfs.infura.io/ipfs/${result.path}`;
-    console.log(link);
+    // console.log(link);
+    onSubmit(link);
   };
   return (
-    <div className="border m-4 p-2">
+    <div className="">
       <form onSubmit={(e) => handleForm(e)}>
         <div className="my-2">
           <label>name</label>
@@ -66,12 +73,9 @@ export const MetadataForm = () => {
         </div>
 
         <div className="my-4">
-          <button
-            className="text-red-500 border p-2 hover:bg-gray-200 rounded-lg"
-            type="submit"
-          >
-            create uri
-          </button>
+          <Button className="" type="submit">
+            {buttonName}
+          </Button>
         </div>
       </form>
     </div>

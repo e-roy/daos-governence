@@ -1,25 +1,17 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
-
-import { ethers } from "ethers";
-
-import { Connect } from "../components/Connect";
 
 import { useContract, useSigner } from "wagmi";
 
-import contracts from "../contracts/hardhat_contracts.json";
-import config from "../config.json";
+import contracts from "@/contracts/hardhat_contracts.json";
+import config from "@/config.json";
 import { useEffect, useState } from "react";
 
 import { ProposalCard } from "@/components/cards";
 import { MetadataForm } from "@/components/ipfs";
 
-const dummyURI =
-  "https://ipfs.infura.io/ipfs/QmaPaiHbmoMv7iuM3AeaTVhxQQm39mBzphu9KXzNHy1geU";
-
 const Landing: NextPage = () => {
-  const [contractName, setContractName] = useState<string>("");
+  // const [contractName, setContractName] = useState<string>("");
   const [contractContent, setContractContent] = useState<string>("");
   const [contractOwnedBy, setContractOwnedBy] = useState<string>("");
   const [indexOf, setIndexOf] = useState<number>(0);
@@ -40,23 +32,23 @@ const Landing: NextPage = () => {
   console.log("network", network);
 
   const foundationFactoryAddress =
-    contracts[chainId][0].contracts.FoundationFactory.address;
+    contracts[chainId][0].contracts.GovernanceFactory.address;
   const foundationFactoryABI =
-    contracts[chainId][0].contracts.FoundationFactory.abi;
+    contracts[chainId][0].contracts.GovernanceFactory.abi;
 
   // console.log("foundationFactoryAddress", foundationFactoryAddress);
   // console.log("foundationFactoryABI", foundationFactoryABI);
 
-  const foundationFactoryContract = useContract({
+  const governanceFactoryContract = useContract({
     addressOrName: foundationFactoryAddress,
     contractInterface: foundationFactoryABI,
     signerOrProvider: signerData,
   });
 
-  console.log("foundation factory", foundationFactoryContract);
+  console.log("foundation factory", governanceFactoryContract);
 
-  const foundationAddress = contracts[chainId][0].contracts.Foundation.address;
-  const foundationABI = contracts[chainId][0].contracts.Foundation.abi;
+  // const foundationAddress = contracts[chainId][0].contracts.Governance.address;
+  const foundationABI = contracts[chainId][0].contracts.Governance.abi;
 
   const foundationContract = useContract({
     addressOrName: usersContract,
@@ -67,18 +59,9 @@ const Landing: NextPage = () => {
   console.log("foundation", foundationContract);
 
   const fetchData = async () => {
-    const numOfGoverences = await foundationFactoryContract.numGovernances();
+    const numOfGoverences = await governanceFactoryContract.numGovernances();
     console.log("goverences # :", Number(numOfGoverences), numOfGoverences);
     setTotalContracts(Number(numOfGoverences));
-    // const total = await foundationFactoryContract.getCounter();
-    // console.log("total contracts", total);
-    // console.log(ethers.utils.formatUnits(total, 1) * 10);
-    // setTotalContracts(ethers.utils.formatUnits(total, 1) * 10);
-    if (usersContract !== "0x0000000000000000000000000000000000000000") {
-      // let id = 1;
-      // const proposal = await foundationContract.proposals(id);
-      // console.log("proposal", proposal);
-    }
   };
 
   useEffect(() => {
@@ -86,18 +69,6 @@ const Landing: NextPage = () => {
       fetchData();
     }
   }, [signerData]);
-
-  const handleCreate = async (e) => {
-    e.preventDefault();
-    const tx = await foundationFactoryContract.createFoundation(
-      contractName,
-      dummyURI
-    );
-    setContractName("");
-    let result = await tx.wait();
-    console.log("tx", result);
-    fetchData();
-  };
 
   const fetchProposalById = async (id) => {
     try {
@@ -132,7 +103,7 @@ const Landing: NextPage = () => {
   };
 
   const handleCheck = async () => {
-    const tx = await foundationFactoryContract.getGoverenceDetails(indexOf);
+    const tx = await governanceFactoryContract.getGoverenceDetails(indexOf);
     setUsersContract(tx._contract);
     console.log("handle check");
     console.log("tx", tx);
@@ -151,7 +122,7 @@ const Landing: NextPage = () => {
       const numOfProposals = await foundationContract.numProposals();
       console.log("proposals # :", Number(numOfProposals), numOfProposals);
       setTotalProposals(Number(numOfProposals));
-      const numOfGoverences = await foundationFactoryContract.numGovernances();
+      const numOfGoverences = await governanceFactoryContract.numGovernances();
       console.log("goverences # :", Number(numOfGoverences), numOfGoverences);
       fetchAllProposals();
     }
@@ -173,30 +144,12 @@ const Landing: NextPage = () => {
       </Head>
 
       <main className={``}>
-        <div>
-          <Connect />
-        </div>
         <div className="m-4 p-2 border">
           <div>current contract : {usersContract}</div>
           <div>total contracts : {totalContracts}</div>
           <div>contract OwnedBy : {contractOwnedBy}</div>
           <div>contract Name : {checkContractName}</div>
           <div>content : {contractContent}</div>
-
-          <form onSubmit={(e) => handleCreate(e)}>
-            <input
-              required
-              value={contractName}
-              onChange={(e) => setContractName(e.target.value)}
-              className="border p-2 rounded=lg"
-            />
-            <button
-              className="text-red-500 border p-1 hover:bg-gray-200"
-              type="submit"
-            >
-              new governance
-            </button>
-          </form>
         </div>
 
         <div className="border m-4 p-2">
@@ -214,16 +167,6 @@ const Landing: NextPage = () => {
           />
         </div>
 
-        <MetadataForm />
-        <div className="m-4 p-2 border">
-          {/* <input type="number" value={0} /> */}
-          <button
-            onClick={() => handleProposal()}
-            className="text-red-500 border p-1 hover:bg-gray-200"
-          >
-            create proposal
-          </button>
-        </div>
         <div className="m-4 p-2 border">
           {proposals.map((proposal, index) => (
             <ProposalCard
