@@ -38,7 +38,7 @@ const DaoGovernance = ({ id }) => {
     signerOrProvider: signerData,
   });
 
-  console.log("governanceContract", governanceContract);
+  // console.log("governanceContract", governanceContract);
 
   useEffect(() => {
     if (governanceContract.signer && id) {
@@ -61,10 +61,11 @@ const DaoGovernance = ({ id }) => {
   }, [governanceContract, id]);
 
   const handleMetadataForm = async (val) => {
-    console.log(val);
+    // console.log(val);
     const tx = await governanceContract.createProposal(totalProposals);
     await tx.wait();
-    console.log("tx", tx);
+    const numOfProposals = await governanceContract.numProposals();
+    setTotalProposals(Number(numOfProposals));
   };
 
   const fetchProposalById = async (id) => {
@@ -91,7 +92,7 @@ const DaoGovernance = ({ id }) => {
         const proposal = await fetchProposalById(i);
         proposals.push(proposal);
       }
-      console.log("proposals", proposals);
+      // console.log("proposals", proposals);
       setProposals(proposals);
       return proposals;
     } catch (error) {
@@ -108,7 +109,7 @@ const DaoGovernance = ({ id }) => {
     if (governanceContract.signer && id) {
       const fetchData = async () => {
         const numOfProposals = await governanceContract.numProposals();
-        console.log("proposals # :", Number(numOfProposals), numOfProposals);
+        // console.log("proposals # :", Number(numOfProposals), numOfProposals);
         setTotalProposals(Number(numOfProposals));
       };
       fetchData();

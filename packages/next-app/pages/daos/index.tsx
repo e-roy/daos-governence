@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
 
-import { useContract, useSigner } from "wagmi";
+import { useContract, useSigner, useNetwork } from "wagmi";
 import contracts from "@/contracts/hardhat_contracts.json";
 import config from "@/config.json";
 
@@ -11,6 +11,8 @@ import { _fetchData } from "ethers/lib/utils";
 
 const DaosPage: NextPage = () => {
   const [{ data: signerData }] = useSigner();
+  const [{ data: networkData }, switchNetwork] = useNetwork();
+
   const [totalGovernance, setTotalGovernance] = useState(0);
   const [governances, setGovernances] = useState([]);
   const [daoAddress, setDaoAddress] = useState("");
@@ -31,6 +33,7 @@ const DaosPage: NextPage = () => {
   // console.log("foundation factory", governanceFactoryContract);
 
   const fetchGovernanceById = async (id) => {
+    if (config.network.id !== networkData.chain.id) return null;
     try {
       const governance = await governanceFactoryContract.getGoverenceDetails(
         id
@@ -49,6 +52,7 @@ const DaosPage: NextPage = () => {
   };
 
   const fetchAllGovernances = async () => {
+    if (config.network.id !== networkData.chain.id) return null;
     try {
       const governances = [];
       for (let i = 0; i < totalGovernance; i++) {
@@ -70,10 +74,11 @@ const DaosPage: NextPage = () => {
 
   useEffect(() => {
     if (signerData && governanceFactoryContract) {
+      if (config.network.id !== networkData.chain.id) return;
       const fetchData = async () => {
         const numOfGoverences =
           await governanceFactoryContract.numGovernances();
-        console.log("goverences # :", Number(numOfGoverences), numOfGoverences);
+        // console.log("goverences # :", Number(numOfGoverences), numOfGoverences);
         setTotalGovernance(Number(numOfGoverences));
       };
       fetchData();
@@ -81,7 +86,8 @@ const DaosPage: NextPage = () => {
   }, [signerData, governanceFactoryContract]);
 
   const handleMetadataForm = async (val: string) => {
-    console.log(val);
+    // console.log(val);
+    if (config.network.id !== networkData.chain.id) return null;
     const tx = await governanceFactoryContract.createGovernance(
       val,
       daoAddress
@@ -89,9 +95,9 @@ const DaosPage: NextPage = () => {
     // setContractName("");
     let result = await tx.wait();
 
-    console.log("tx", result);
+    // console.log("tx", result);
     const numOfGoverences = await governanceFactoryContract.numGovernances();
-    console.log("goverences # :", Number(numOfGoverences), numOfGoverences);
+    // console.log("goverences # :", Number(numOfGoverences), numOfGoverences);
     setTotalGovernance(Number(numOfGoverences));
   };
 

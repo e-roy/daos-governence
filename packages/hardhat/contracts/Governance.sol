@@ -110,9 +110,7 @@ contract Governance is ERC721URIStorage {
         nftHolderOnly
         activeProposalOnly(proposalIndex)
     {
-    // function voteOnProposal(uint256 proposalIndex, Vote vote)
-    //     public
-    // {
+
         Proposal storage proposal = proposals[proposalIndex];
 
         // uint256 voterNFTBalance = foundation.balanceOf(msg.sender);

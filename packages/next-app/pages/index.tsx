@@ -1,139 +1,21 @@
 import type { NextPage } from "next";
 import Head from "next/head";
+import { useRouter } from "next/router";
 
-import { useContract, useSigner } from "wagmi";
+import { useNetwork } from "wagmi";
 
-import contracts from "@/contracts/hardhat_contracts.json";
-import config from "@/config.json";
-import { useEffect, useState } from "react";
-
-import { ProposalCard } from "@/components/cards";
-import { MetadataForm } from "@/components/ipfs";
+import { Button } from "@/components/elements";
 
 const Landing: NextPage = () => {
-  // const [contractName, setContractName] = useState<string>("");
-  const [contractContent, setContractContent] = useState<string>("");
-  const [contractOwnedBy, setContractOwnedBy] = useState<string>("");
-  const [indexOf, setIndexOf] = useState<number>(0);
-  const [totalContracts, setTotalContracts] = useState<number>(0);
-  const [checkContractName, setCheckContractName] = useState<string>("");
-  const [totalProposals, setTotalProposals] = useState(0);
-  const [proposals, setProposals] = useState([]);
+  const router = useRouter();
 
-  const [usersContract, setUsersContract] = useState<string>(
-    "0x0000000000000000000000000000000000000000"
-  );
+  const [{ data: networkData }, switchNetwork] = useNetwork();
 
-  const [{ data: signerData }] = useSigner();
-
-  const chainId = Number(config.network.id);
-  console.log("chainId", chainId);
-  const network = config.network.name;
-  console.log("network", network);
-
-  const foundationFactoryAddress =
-    contracts[chainId][0].contracts.GovernanceFactory.address;
-  const foundationFactoryABI =
-    contracts[chainId][0].contracts.GovernanceFactory.abi;
-
-  // console.log("foundationFactoryAddress", foundationFactoryAddress);
-  // console.log("foundationFactoryABI", foundationFactoryABI);
-
-  const governanceFactoryContract = useContract({
-    addressOrName: foundationFactoryAddress,
-    contractInterface: foundationFactoryABI,
-    signerOrProvider: signerData,
-  });
-
-  console.log("foundation factory", governanceFactoryContract);
-
-  // const foundationAddress = contracts[chainId][0].contracts.Governance.address;
-  const foundationABI = contracts[chainId][0].contracts.Governance.abi;
-
-  const foundationContract = useContract({
-    addressOrName: usersContract,
-    contractInterface: foundationABI,
-    signerOrProvider: signerData,
-  });
-
-  console.log("foundation", foundationContract);
-
-  const fetchData = async () => {
-    const numOfGoverences = await governanceFactoryContract.numGovernances();
-    console.log("goverences # :", Number(numOfGoverences), numOfGoverences);
-    setTotalContracts(Number(numOfGoverences));
-  };
-
-  useEffect(() => {
-    if (signerData) {
-      fetchData();
-    }
-  }, [signerData]);
-
-  const fetchProposalById = async (id) => {
-    try {
-      const proposal = await foundationContract.proposals(id);
-      const parsedProposal = {
-        proposalId: id,
-        nftTokenId: proposal.nftTokenId.toString(),
-        deadline: new Date(parseInt(proposal.deadline.toString()) * 1000),
-        yayVotes: proposal.yesVotes.toString(),
-        nayVotes: proposal.noVotes.toString(),
-        executed: proposal.executed,
-      };
-      return parsedProposal;
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const fetchAllProposals = async () => {
-    try {
-      const proposals = [];
-      for (let i = 0; i < totalProposals; i++) {
-        const proposal = await fetchProposalById(i);
-        proposals.push(proposal);
-      }
-      console.log("proposals", proposals);
-      setProposals(proposals);
-      return proposals;
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleCheck = async () => {
-    const tx = await governanceFactoryContract.getGoverenceDetails(indexOf);
-    setUsersContract(tx._contract);
-    console.log("handle check");
-    console.log("tx", tx);
-    if (usersContract !== "0x0000000000000000000000000000000000000000") {
-      // const ownedBy = await foundationContract.ownerOf();
-      // console.log("ownedBy", ownedBy);
-      // setContractOwnedBy(ownedBy);
-      const name = await foundationContract.name();
-      console.log("name", name);
-      setCheckContractName(name);
-      const _name = await foundationContract._name();
-      console.log("_name", _name);
-      const content = await foundationContract._content();
-      console.log("content", content);
-      setContractContent(content);
-      const numOfProposals = await foundationContract.numProposals();
-      console.log("proposals # :", Number(numOfProposals), numOfProposals);
-      setTotalProposals(Number(numOfProposals));
-      const numOfGoverences = await governanceFactoryContract.numGovernances();
-      console.log("goverences # :", Number(numOfGoverences), numOfGoverences);
-      fetchAllProposals();
-    }
-  };
-
-  const handleProposal = async () => {
-    console.log("handle proposal");
-    const tx = await foundationContract.createProposal(1);
-    await tx.wait();
-    console.log("tx", tx);
-  };
+  if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
+    console.log("development");
+  } else {
+    console.log("production");
+  }
 
   return (
     <div className={``}>
@@ -144,37 +26,8 @@ const Landing: NextPage = () => {
       </Head>
 
       <main className={``}>
-        <div className="m-4 p-2 border">
-          <div>current contract : {usersContract}</div>
-          <div>total contracts : {totalContracts}</div>
-          <div>contract OwnedBy : {contractOwnedBy}</div>
-          <div>contract Name : {checkContractName}</div>
-          <div>content : {contractContent}</div>
-        </div>
-
-        <div className="border m-4 p-2">
-          <button
-            onClick={() => handleCheck()}
-            className="text-red-500 border p-1 hover:bg-gray-200"
-          >
-            check foundation address for
-          </button>
-          <input
-            className="border"
-            type="number"
-            value={indexOf}
-            onChange={(e) => setIndexOf(Number(e.target.value))}
-          />
-        </div>
-
-        <div className="m-4 p-2 border">
-          {proposals.map((proposal, index) => (
-            <ProposalCard
-              key={index}
-              proposal={proposal}
-              contract={foundationContract}
-            />
-          ))}
+        <div>
+          <Button onClick={() => router.push(`/daos`)}>DAOs Page</Button>
         </div>
       </main>
 
