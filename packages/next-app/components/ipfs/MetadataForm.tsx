@@ -1,6 +1,7 @@
-import { useState } from "react";
 import { uploadIpfs } from "@/lib/ipfs/ipfs";
 import { Button } from "@/components/elements";
+
+import { useForm } from "react-hook-form";
 
 type MetadataFormProps = {
   onSubmit: (metadata: any) => void;
@@ -8,12 +9,15 @@ type MetadataFormProps = {
 };
 
 export const MetadataForm = ({ onSubmit, buttonName }: MetadataFormProps) => {
-  const [name, setName] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [content, setContent] = useState<string>("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
-  const handleForm = async (e) => {
-    e.preventDefault();
+  const formSubmit = async (data) => {
+    const { name, description, content } = data;
+
     let media = [] as any[];
     // if (selectedPicture) {
     //   media = [
@@ -35,48 +39,42 @@ export const MetadataForm = ({ onSubmit, buttonName }: MetadataFormProps) => {
     // console.log(link);
     onSubmit(link);
   };
+
   return (
     <div className="">
-      <form onSubmit={(e) => handleForm(e)}>
+      <form onSubmit={handleSubmit(formSubmit)}>
         <div className="my-2">
           <label>name</label>
-          <div>
-            <input
-              value={name}
-              placeholder="name"
-              onChange={(e) => setName(e.target.value)}
-              className="border p-2 rounded=lg w-full rounded outline-none"
-            />
-          </div>
+          <input
+            {...register("name")}
+            placeholder="name"
+            className="mt-2 mb-4 p-2 border rounded=lg w-full rounded outline-none resize-none text-stone-800 font-medium"
+            required
+          />
         </div>
         <div className="my-2">
           <label>description</label>
-          <div>
-            <input
-              value={description}
-              placeholder="description"
-              onChange={(e) => setDescription(e.target.value)}
-              className="border p-2 rounded=lg w-full rounded outline-none"
-            />
-          </div>
+          <input
+            {...register("description")}
+            placeholder="description"
+            className="mt-2 mb-4 p-2 border rounded=lg w-full rounded outline-none resize-none text-stone-800 font-medium"
+            required
+          />
         </div>
         <div className="my-2">
-          <label>content</label>
-          <div>
-            <input
-              value={content}
-              placeholder="content"
-              onChange={(e) => setContent(e.target.value)}
-              className="border p-2 rounded=lg w-full rounded outline-none"
-            />
-          </div>
+          <label className="">content</label>
+          <textarea
+            {...register("content")}
+            placeholder="content"
+            rows={12}
+            className="mt-2 mb-4 p-2 border rounded=lg w-full rounded outline-none resize-none text-stone-800 font-medium"
+            required
+          />
         </div>
 
-        <div className="my-4">
-          <Button className="" type="submit">
-            {buttonName}
-          </Button>
-        </div>
+        <Button className="" type="submit">
+          {buttonName}
+        </Button>
       </form>
     </div>
   );

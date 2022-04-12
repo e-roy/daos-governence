@@ -5,8 +5,9 @@ import { useContract, useSigner } from "wagmi";
 import contracts from "@/contracts/hardhat_contracts.json";
 import config from "@/config.json";
 
-import { MetadataForm } from "@/components/ipfs";
 import { ProposalCard } from "@/components/cards";
+
+import { CreateProposal } from "@/components/gov";
 
 const DaoGovernancePage: NextPage = () => {
   const router = useRouter();
@@ -25,6 +26,7 @@ type contentType = {
 };
 
 const DaoGovernance = ({ id }) => {
+  const router = useRouter();
   const [content, setContent] = useState<contentType>({} as contentType);
   const [totalProposals, setTotalProposals] = useState(0);
   const [proposals, setProposals] = useState([]);
@@ -59,14 +61,6 @@ const DaoGovernance = ({ id }) => {
       fetchData();
     }
   }, [governanceContract, id]);
-
-  const handleMetadataForm = async (val) => {
-    // console.log(val);
-    const tx = await governanceContract.createProposal(totalProposals);
-    await tx.wait();
-    const numOfProposals = await governanceContract.numProposals();
-    setTotalProposals(Number(numOfProposals));
-  };
 
   const fetchProposalById = async (id) => {
     try {
@@ -118,16 +112,12 @@ const DaoGovernance = ({ id }) => {
 
   return (
     <div>
+      <button onClick={() => router.back()}>Back</button>
       <h1>Doa Governance Contract Page</h1>
       <div>name: {content.name}</div>
       <div>description: {content.description}</div>
       <div>content: {content.content}</div>
-      <MetadataForm
-        onSubmit={(val) => {
-          handleMetadataForm(val);
-        }}
-        buttonName="create proposal"
-      />
+
       <div className="m-4 p-2 border">
         {proposals.map((proposal, index) => (
           <ProposalCard
@@ -137,6 +127,7 @@ const DaoGovernance = ({ id }) => {
           />
         ))}
       </div>
+      <CreateProposal daoAddress={id} />
     </div>
   );
 };

@@ -24,7 +24,7 @@ export const GovCard = ({ governance }) => {
     signerOrProvider: signerData,
   });
 
-  //   console.log("governance", governanceContract);
+  // console.log("governance", governance);
 
   useEffect(() => {
     if (governanceContract.signer) {
@@ -35,7 +35,7 @@ export const GovCard = ({ governance }) => {
           await fetch(content)
             .then((res) => res.json())
             .then((data) => {
-              //   console.log("data", data);
+              // console.log("data", data);
               setContent(data);
             });
         } catch (error) {
@@ -53,6 +53,7 @@ export const GovCard = ({ governance }) => {
           <div>name: {content.name}</div>
           <div>description: {content.description}</div>
           <div>content: {content.content}</div>
+          <div>dao: {governance.doaAddress}</div>
         </div>
       </Link>
     </div>

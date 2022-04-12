@@ -9,7 +9,7 @@ export const Header = ({}: HeaderProps) => {
   const router = useRouter();
   const [{ data: accountData, error, loading }, disconnect] = useAccount();
   return (
-    <div className="flex justify-between m-2">
+    <div className="flex justify-between p-2">
       <div className="cursor-pointer" onClick={() => router.push(`/`)}>
         Header
       </div>
