@@ -19,9 +19,7 @@ const Landing: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={``}>
-        <Button onClick={() => router.push(`/daos`)}>DAOs Page</Button>
-      </main>
+      <main className={``}>landing page</main>
       <footer className={``}></footer>
     </div>
   );

@@ -4,6 +4,8 @@ import { useContract, useSigner, useNetwork } from "wagmi";
 import contracts from "@/contracts/hardhat_contracts.json";
 import config from "@/config.json";
 
+import { PlusIcon } from "@heroicons/react/outline";
+
 export const SidebarNav = () => {
   const [{ data: signerData }] = useSigner();
   const [{ data: networkData }] = useNetwork();
@@ -93,7 +95,19 @@ export const SidebarNav = () => {
     }
   }, [signerData, governanceFactoryContract]);
   return (
-    <div className="h-9/10 overflow-y-auto mx-2 -mt-4 w-20 border rounded-lg px-2 py-4">
+    <div className="h-9/10 overflow-y-auto overflow-x-hidden mx-2 -mt-4 w-20 border rounded-lg px-3 py-4">
+      <button
+        className="mx-auto my-2 inline-block relative cursor-pointer"
+        onClick={() => router.push(`/daos`)}
+      >
+        <div
+          className={"h-12 w-12 rounded-full bg-stone-100 hover:bg-stone-200"}
+          // src={
+          //   "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+          // }
+          // alt={governance.doaAddress}
+        />
+      </button>
       {governances.map((governance, index) => (
         <button
           key={index}
@@ -113,6 +127,13 @@ export const SidebarNav = () => {
           </span>
         </button>
       ))}
+
+      <button
+        className="mx-auto my-2 inline-block relative rounded-full h-12 w-12 bg-stone-100 hover:bg-stone-200 cursor-pointer"
+        onClick={() => router.push(`/daos/join`)}
+      >
+        <PlusIcon className="h-8 w-8 text-stone-700 m-auto" />
+      </button>
     </div>
   );
 };

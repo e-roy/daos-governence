@@ -30,7 +30,7 @@ export const uploadIpfs = async ({ payload }: uploadIpfsProps) => {
       name: payload.name,
       attributes: [],
       media: payload.media || [],
-      appId: "",
+      // appId: "",
     })
   );
 

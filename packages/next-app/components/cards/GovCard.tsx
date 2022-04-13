@@ -50,10 +50,11 @@ export const GovCard = ({ governance }) => {
     <div className="border cursor-pointer">
       <Link href={`/gov/${governance.contract}`} passHref>
         <div>
+          <div>dao: {governance.doaAddress}</div>
+
           <div>name: {content.name}</div>
           <div>description: {content.description}</div>
-          <div>content: {content.content}</div>
-          <div>dao: {governance.doaAddress}</div>
+          <div className="line-clamp-2">content: {content.content}</div>
         </div>
       </Link>
     </div>
