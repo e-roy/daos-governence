@@ -16,6 +16,10 @@ contract Governance is ERC721URIStorage {
     struct Proposal {
         // nftTokenId - the tokenID of the NFT to purchase from FakeNFTMarketplace if the proposal passes
         uint256 nftTokenId;
+        // content - the content of the proposal
+        string content;
+        // doaAddress - the address of the doa that the proposal is for
+        string doaAddress;
         // deadline - the UNIX timestamp until which this proposal is active. Proposal can be executed after the deadline has been exceeded.
         uint256 deadline;
         // yesVotes - number of no votes for this proposal
@@ -83,16 +87,19 @@ contract Governance is ERC721URIStorage {
     }
 
     /// @dev createProposal allows a the NFT holder to create a new proposal in the DAO
-    /// @param _nftTokenId - the tokenID of the NFT to be purchased from FakeNFTMarketplace if this proposal passes
+    /// @param content - the proposal's content
+    /// @param doaAddress - the address of doa that the proposal is for
     /// @return Returns the proposal index for the newly created proposal
-    function createProposal(uint256 _nftTokenId)
+    function createProposal(string memory content, string memory doaAddress)
         external
         nftHolderOnly
         returns (uint256)
     {
         // require(nftMarketplace.available(_nftTokenId), "NFT_NOT_FOR_SALE");
         Proposal storage proposal = proposals[numProposals];
-        proposal.nftTokenId = _nftTokenId;
+        proposal.nftTokenId = numProposals;
+        proposal.content = content;
+        proposal.doaAddress = doaAddress;
         // Set the proposal's voting deadline to be (current time + 5 minutes)
         proposal.deadline = block.timestamp + 5 minutes;
 

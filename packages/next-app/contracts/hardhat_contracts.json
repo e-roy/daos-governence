@@ -293,9 +293,14 @@
             {
               "inputs": [
                 {
-                  "internalType": "uint256",
-                  "name": "_nftTokenId",
-                  "type": "uint256"
+                  "internalType": "string",
+                  "name": "content",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "doaAddress",
+                  "type": "string"
                 }
               ],
               "name": "createProposal",
@@ -424,6 +429,16 @@
                   "internalType": "uint256",
                   "name": "nftTokenId",
                   "type": "uint256"
+                },
+                {
+                  "internalType": "string",
+                  "name": "content",
+                  "type": "string"
+                },
+                {
+                  "internalType": "string",
+                  "name": "doaAddress",
+                  "type": "string"
                 },
                 {
                   "internalType": "uint256",

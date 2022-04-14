@@ -1,3 +1,4 @@
+import { useAccount } from "wagmi";
 import { uploadIpfs } from "@/lib/ipfs/ipfs";
 import { Button } from "@/components/elements";
 
@@ -9,6 +10,8 @@ type MetadataFormProps = {
 };
 
 export const MetadataForm = ({ onSubmit, buttonName }: MetadataFormProps) => {
+  const [{ data: accountData }] = useAccount();
+
   const {
     register,
     handleSubmit,
@@ -18,6 +21,7 @@ export const MetadataForm = ({ onSubmit, buttonName }: MetadataFormProps) => {
   const formSubmit = async (data) => {
     const { name, description, content } = data;
 
+    // considering paylaod to meet snapshot and openSea requirements
     let media = [] as any[];
     // if (selectedPicture) {
     //   media = [
@@ -32,6 +36,44 @@ export const MetadataForm = ({ onSubmit, buttonName }: MetadataFormProps) => {
       description,
       content,
       media: media,
+      address: accountData.address,
+      sig: "",
+      data: {
+        domain: {
+          name: "testing",
+          version: "1.0.0",
+        },
+        types: {
+          Proposal: [
+            { name: "from", type: "address" },
+            { name: "space", type: "string" },
+            { name: "timestamp", type: "uint64" },
+            { name: "type", type: "string" },
+            { name: "title", type: "string" },
+            { name: "body", type: "string" },
+            { name: "choices", type: "string[]" },
+            { name: "start", type: "uint64" },
+            { name: "end", type: "uint64" },
+            { name: "snapshot", type: "uint64" },
+            { name: "network", type: "string" },
+            { name: "strategies", type: "string" },
+            { name: "plugins", type: "string" },
+            { name: "metadata", type: "string" },
+          ],
+        },
+        message: {
+          space: "",
+          type: "string",
+          title: name,
+          body: content,
+          choices: ["For", "Against"],
+          start: 0,
+          end: 0,
+          network: "",
+          from: accountData.address,
+          timestamp: 0,
+        },
+      },
     };
     const result = await uploadIpfs({ payload });
     // console.log(result);

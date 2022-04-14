@@ -5,9 +5,7 @@ import { useContract, useSigner } from "wagmi";
 import contracts from "@/contracts/hardhat_contracts.json";
 import config from "@/config.json";
 
-import { ProposalCard } from "@/components/cards";
-
-import { CreateProposal, CurrentProposals } from "@/components/gov";
+import { CreateProposal, ProposalDisplay } from "@/components/gov";
 
 import { RewindIcon } from "@heroicons/react/outline";
 
@@ -33,6 +31,7 @@ type contentType = {
 const DaoGovernance = ({ id }) => {
   const router = useRouter();
   const [content, setContent] = useState<contentType>({} as contentType);
+  const [contentUrl, setContentUrl] = useState("");
   const [totalProposals, setTotalProposals] = useState(0);
   const [proposals, setProposals] = useState([]);
   const [{ data: signerData }] = useSigner();
@@ -54,7 +53,7 @@ const DaoGovernance = ({ id }) => {
       const fetchData = async () => {
         try {
           const content = await governanceContract.getContent();
-          //   console.log("content", content);
+          // console.log("content", content);
           await fetch(content)
             .then((res) => res.json())
             .then((data) => {
@@ -72,10 +71,13 @@ const DaoGovernance = ({ id }) => {
   const fetchProposalById = async (id) => {
     try {
       const proposal = await governanceContract.proposals(id);
+      // console.log("proposal", proposal);
       const parsedProposal = {
         proposalId: id,
         nftTokenId: proposal.nftTokenId.toString(),
         deadline: new Date(parseInt(proposal.deadline.toString()) * 1000),
+        content: proposal.content,
+        doaAddress: proposal.doaAddress,
         yayVotes: proposal.yesVotes.toString(),
         nayVotes: proposal.noVotes.toString(),
         executed: proposal.executed,
@@ -137,6 +139,12 @@ const DaoGovernance = ({ id }) => {
             <h1>Doa Governance Contract Page is here</h1>
             <div>name: {content.name}</div>
             <div>description: {content.description}</div>
+            <div className="my-2">
+              status :
+              <span className="bg-green-700 ml-2 py-1 px-2 rounded-xl text-sm">
+                taking proposals
+              </span>
+            </div>
             <button
               className="my-1 w-full border-2 p-1 rounded-xl border-stone-100/50 hover:border-stone-100"
               onClick={() => setGovNav("governance")}
@@ -145,10 +153,24 @@ const DaoGovernance = ({ id }) => {
             </button>
             <button
               className="my-1 w-full border-2 p-1 rounded-xl border-stone-100/50 hover:border-stone-100"
-              onClick={() => setGovNav("current")}
+              onClick={() => setGovNav("create")}
             >
-              current
+              create proposal
             </button>
+            <div className="h-0.5 bg-stone-500 my-2"></div>
+
+            {proposals.map((proposal, index) => (
+              <button
+                key={index}
+                className="my-1 w-full border-2 p-1 rounded-xl border-stone-100/50 hover:border-stone-100"
+                onClick={() => {
+                  setContentUrl(proposal.content);
+                  setGovNav("current");
+                }}
+              >
+                Proposal id : {proposal.proposalId}
+              </button>
+            ))}
           </div>
 
           <div className="bg-stone-100 py-4 my-4 flex justify-center mx-2 p-4 w-full rounded-xl h-8/10 overflow-y-scroll">
@@ -157,20 +179,14 @@ const DaoGovernance = ({ id }) => {
                 {content.content}
               </ReactMarkdown>
             )}
-            {govNav === "current" && <CurrentProposals id={id} />}
+            {govNav === "create" && <CreateProposal daoAddress={id} />}
+            {govNav === "current" && <ProposalDisplay url={contentUrl} />}
           </div>
         </div>
-
-        {/* <div className="m-4 p-2 border">
-          {proposals.map((proposal, index) => (
-            <ProposalCard
-              key={index}
-              proposal={proposal}
-              contract={governanceContract}
-            />
-          ))}
-        </div> */}
-        {/* <CreateProposal daoAddress={id} /> */}
+        <div className="flex -mt-4">
+          <div className="w-1/3"></div>
+          <div className="w-2/3 bg-black">voting</div>
+        </div>
       </div>
     </div>
   );

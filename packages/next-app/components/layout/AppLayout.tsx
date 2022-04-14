@@ -15,7 +15,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 
         <div className="flex-1 flex">
           <SidebarNav />
-          <div className="w-full h-9/10 mx-8 -mt-4 p-4">{children}</div>
+          <div className="w-full h-9/10 sm:ml-8 -mt-4 px-4">{children}</div>
         </div>
       </main>
     );

@@ -10,9 +10,7 @@ export const Header = ({}: HeaderProps) => {
   const [{ data: accountData, error, loading }, disconnect] = useAccount();
   return (
     <div className="flex justify-between p-2">
-      <div className="cursor-pointer" onClick={() => router.push(`/`)}>
-        Header
-      </div>
+      <div className="cursor-pointer" onClick={() => router.push(`/`)}></div>
       <SwitchNetwork />
 
       {!accountData ? (

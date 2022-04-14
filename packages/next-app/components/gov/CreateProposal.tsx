@@ -21,14 +21,15 @@ export const CreateProposal = ({ daoAddress }: CreateProposalProps) => {
 
   const handleMetadataForm = async (val) => {
     console.log(val);
-    // const tx = await governanceContract.createProposal(totalProposals);
-    // await tx.wait();
+    const tx = await governanceContract.createProposal(val, daoAddress);
+    const result = await tx.wait();
+    console.log(result);
     // const numOfProposals = await governanceContract.numProposals();
     // setTotalProposals(Number(numOfProposals));
   };
 
   return (
-    <div>
+    <div className="w-full text-stone-700 font-medium">
       <div>create proposal</div>
       <MetadataForm
         onSubmit={(val) => {
