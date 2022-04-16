@@ -3,7 +3,11 @@ import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-export const ProposalDisplay = ({ url }) => {
+type MarkdownDisplayProps = {
+  url: string;
+};
+
+export const MarkdownDisplay = ({ url }: MarkdownDisplayProps) => {
   // console.log("url", url);
   const [content, setContent] = useState("");
 

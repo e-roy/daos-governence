@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useAccount } from "wagmi";
 import { uploadIpfs } from "@/lib/ipfs/ipfs";
+import { MarkdownEditorComponent } from "@/components/gov";
 import { Button } from "@/components/elements";
 
 import { useForm } from "react-hook-form";
@@ -12,6 +14,8 @@ type MetadataFormProps = {
 export const MetadataForm = ({ onSubmit, buttonName }: MetadataFormProps) => {
   const [{ data: accountData }] = useAccount();
 
+  const [content, setContent] = useState("");
+
   const {
     register,
     handleSubmit,
@@ -19,7 +23,7 @@ export const MetadataForm = ({ onSubmit, buttonName }: MetadataFormProps) => {
   } = useForm();
 
   const formSubmit = async (data) => {
-    const { name, description, content } = data;
+    const { name, description } = data;
 
     // considering paylaod to meet snapshot and openSea requirements
     let media = [] as any[];
@@ -67,11 +71,11 @@ export const MetadataForm = ({ onSubmit, buttonName }: MetadataFormProps) => {
           title: name,
           body: content,
           choices: ["For", "Against"],
-          start: 0,
-          end: 0,
+          start: Date.now(),
+          end: Date.now(),
           network: "",
           from: accountData.address,
-          timestamp: 0,
+          timestamp: Date.now(),
         },
       },
     };
@@ -105,13 +109,7 @@ export const MetadataForm = ({ onSubmit, buttonName }: MetadataFormProps) => {
         </div>
         <div className="my-2">
           <label className="">content</label>
-          <textarea
-            {...register("content")}
-            placeholder="content"
-            rows={12}
-            className="mt-2 mb-4 p-2 border rounded=lg w-full rounded outline-none resize-none text-stone-800 font-medium"
-            required
-          />
+          <MarkdownEditorComponent onChange={setContent} />
         </div>
 
         <Button className="" type="submit">

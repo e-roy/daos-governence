@@ -87,7 +87,7 @@ const DaoGroupPage: NextPage = () => {
   if (!id) return null;
   else
     return (
-      <div className="w-full h-9/10">
+      <div className="w-full h-9/10 overflow-y-auto">
         <div>dao : {id}</div>
         <div className="text-center text-2xl font-medium">Vote Gov</div>
         <div className="w-full">

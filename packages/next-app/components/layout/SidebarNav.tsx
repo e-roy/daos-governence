@@ -95,7 +95,7 @@ export const SidebarNav = () => {
     }
   }, [signerData, governanceFactoryContract]);
   return (
-    <div className="h-9/10 overflow-y-auto overflow-x-hidden mx-2 -mt-4 w-20 border rounded-lg px-3 py-4">
+    <div className="overflow-y-auto overflow-x-hidden mx-2 w-20 border rounded-lg px-3 py-4">
       <button
         className="mx-auto my-2 inline-block relative cursor-pointer"
         onClick={() => router.push(`/daos`)}

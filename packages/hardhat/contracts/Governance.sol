@@ -12,20 +12,34 @@ contract Governance is ERC721URIStorage {
     string public _content;
     string public _doaAddress;
 
-        // Create a struct named Proposal containing all relevant information
+    uint256 public _forGovernanceVotes;
+    uint256 public _againstGovernanceVotes;
+
+    string public _governanceStatus;
+
+    uint256 public _timeCreated;
+    uint256 public _timeGovVoteEnd;
+    uint256 public _timeProposalSubmitEnd;
+    uint256 public _timeProposalVoteEnd;
+
+
+
+    // Create a struct named Proposal containing all relevant information
     struct Proposal {
-        // nftTokenId - the tokenID of the NFT to purchase from FakeNFTMarketplace if the proposal passes
-        uint256 nftTokenId;
         // content - the content of the proposal
         string content;
         // doaAddress - the address of the doa that the proposal is for
         string doaAddress;
         // deadline - the UNIX timestamp until which this proposal is active. Proposal can be executed after the deadline has been exceeded.
         uint256 deadline;
-        // yesVotes - number of no votes for this proposal
-        uint256 yesVotes;
-        // noVotes - number of no votes for this proposal
-        uint256 noVotes;
+        // forProposalVotes - number of yes votes for this proposal
+        uint256 forProposalVotes;
+        // againstProposalVotes - number of no votes for this proposal
+        uint256 againstProposalVotes;
+        // forProposalVotes - number of yes votes for this proposal
+        uint256 forProposalExecute;
+        // againstProposalVotes - number of no votes for this proposal
+        uint256 againstProposalExecute;
         // executed - whether or not this proposal has been executed yet. Cannot be executed before the deadline has been exceeded.
         bool executed;
         // voters - a mapping of the NFT tokenIDs to booleans indicating whether that NFT has already been used to cast a vote or not
@@ -51,6 +65,14 @@ contract Governance is ERC721URIStorage {
         _owner = owner;
         _content = content;
         _doaAddress = doaAddress;
+        // yesVotes - number of no votes for this governance
+        _forGovernanceVotes = 0;
+        // noVotes - number of no votes for this governance
+        _againstGovernanceVotes = 0;
+        // set the governance status to "Voting"
+        _governanceStatus = "Voting";
+        // set the timeCreated to the current block timestamp
+        _timeCreated = block.timestamp;
     }
 
  
@@ -60,6 +82,23 @@ contract Governance is ERC721URIStorage {
         // require(foundation.balanceOf(msg.sender) > 0, "NOT_A_DAO_MEMBER");
         _;
     }
+
+
+    function voteOnGovernance(Vote vote)
+        external
+        nftHolderOnly
+    {
+        uint256 numVotes = 1;
+  
+        // require(numVotes > 0, "ALREADY_VOTED");
+
+        if (vote == Vote.YES) {
+            _forGovernanceVotes += numVotes;
+        } else {
+            _againstGovernanceVotes += numVotes;
+        }
+    }
+
 
     // Create a modifier which only allows a function to be
     // called if the given proposal's deadline has not been exceeded yet
@@ -97,7 +136,6 @@ contract Governance is ERC721URIStorage {
     {
         // require(nftMarketplace.available(_nftTokenId), "NFT_NOT_FOR_SALE");
         Proposal storage proposal = proposals[numProposals];
-        proposal.nftTokenId = numProposals;
         proposal.content = content;
         proposal.doaAddress = doaAddress;
         // Set the proposal's voting deadline to be (current time + 5 minutes)
@@ -137,9 +175,9 @@ contract Governance is ERC721URIStorage {
         require(numVotes > 0, "ALREADY_VOTED");
 
         if (vote == Vote.YES) {
-            proposal.yesVotes += numVotes;
+            proposal.forProposalVotes += numVotes;
         } else {
-            proposal.noVotes += numVotes;
+            proposal.againstProposalVotes += numVotes;
         }
     }
 

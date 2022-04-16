@@ -5,12 +5,9 @@ import { useContract, useSigner } from "wagmi";
 import contracts from "@/contracts/hardhat_contracts.json";
 import config from "@/config.json";
 
-import { CreateProposal, ProposalDisplay } from "@/components/gov";
+import { CreateProposal, MarkdownDisplay } from "@/components/gov";
 
 import { RewindIcon } from "@heroicons/react/outline";
-
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 
 const DaoGovernancePage: NextPage = () => {
   const router = useRouter();
@@ -21,23 +18,20 @@ const DaoGovernancePage: NextPage = () => {
 
 export default DaoGovernancePage;
 
-type contentType = {
-  id: string;
-  name: string;
-  description: string;
-  content: string;
-};
-
 const DaoGovernance = ({ id }) => {
   const router = useRouter();
-  const [content, setContent] = useState<contentType>({} as contentType);
+  const [proposalId, setProposalId] = useState<string>("");
   const [contentUrl, setContentUrl] = useState("");
   const [totalProposals, setTotalProposals] = useState(0);
   const [proposals, setProposals] = useState([]);
   const [{ data: signerData }] = useSigner();
   const chainId = Number(config.network.id);
 
-  const [govNav, setGovNav] = useState("governance");
+  const [govNav, setGovNav] = useState("markdown");
+
+  const [status, setStatus] = useState("");
+  const [created, setCreated] = useState("");
+  const [createdTime, setCreatedTime] = useState("");
 
   const governanceABI = contracts[chainId][0].contracts.Governance.abi;
   const governanceContract = useContract({
@@ -46,20 +40,59 @@ const DaoGovernance = ({ id }) => {
     signerOrProvider: signerData,
   });
 
-  // console.log("governanceContract", governanceContract);
+  console.log("governanceContract", governanceContract);
 
   useEffect(() => {
     if (governanceContract.signer && id) {
       const fetchData = async () => {
         try {
+          const status = await governanceContract._governanceStatus();
+          console.log("status", status);
+          setStatus(status);
+          const yes = await governanceContract._forGovernanceVotes();
+          console.log("yes", yes);
+          const no = await governanceContract._againstGovernanceVotes();
+          console.log("no", no);
+          const created = await governanceContract._timeCreated();
+          console.log("created", created);
+          // convert created from big number to number
+          const createdNumber = created.toNumber();
+          const createdDate = new Date(createdNumber * 1000);
+          const locale = "en";
+          // console.log(
+          //   createdDate.toLocaleDateString(locale, {
+          //     hour: "numeric",
+          //     minute: "numeric",
+          //     second: "numeric",
+          //   })
+          // );
+          // console.log(typeof createdDate);
+          const formattedDate = createdDate.toLocaleDateString(locale, {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+          });
+          setCreated(formattedDate);
+
+          const formattedTime = createdDate.toLocaleDateString(locale, {
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric",
+          });
+          setCreatedTime(formattedTime);
+
+          const govVoteEnd = await governanceContract._timeGovVoteEnd();
+          console.log("govVoteEnd", govVoteEnd);
+          const proposalSubmitEnd =
+            await governanceContract._timeProposalSubmitEnd();
+          console.log("proposalSubmitEnd", proposalSubmitEnd);
+          const proposalVoteEnd =
+            await governanceContract._timeProposalVoteEnd();
+          console.log("proposalVoteEnd", proposalVoteEnd);
+
           const content = await governanceContract.getContent();
-          // console.log("content", content);
-          await fetch(content)
-            .then((res) => res.json())
-            .then((data) => {
-              //   console.log("data", data);
-              setContent(data);
-            });
+          console.log("content", content);
+          setContentUrl(content);
         } catch (error) {
           console.error(error);
         }
@@ -121,33 +154,50 @@ const DaoGovernance = ({ id }) => {
 
   // console.log("content", content);
 
+  const voteOnProposal = async (proposalId, _vote) => {
+    console.log(proposalId);
+    try {
+      let vote = _vote === "YES" ? 0 : 1;
+      // const txn = await governanceContract.voteOnProposal(proposalId, vote);
+      const txn = await governanceContract.voteOnGovernance(vote);
+      // setLoading(true);
+      await txn.wait();
+      console.log(txn);
+      // setLoading(false);
+      await fetchAllProposals();
+    } catch (error) {
+      console.error(error);
+      window.alert(error.data.message);
+    }
+  };
+
   return (
     <div className="w-full">
-      <div className="flex justify-between">
-        <button
-          className="flex font-medium border-2 py-1 px-2 rounded-xl border-stone-100/50 hover:border-stone-100"
-          onClick={() => router.back()}
-        >
-          <RewindIcon className="w-6 h-6" />
-          <span className="pl-2">Back</span>
-        </button>
-      </div>
+      <div className="grid grid-cols-3 gap-8 h-14/16">
+        <div className="col-span-1">
+          <div className="mb-4">
+            <button
+              className="flex font-medium border-2 py-1 px-4 rounded-xl border-stone-100/50 hover:border-stone-100"
+              onClick={() => router.back()}
+            >
+              <RewindIcon className="w-6 h-6" />
+              <span className="pl-2">Back</span>
+            </button>
+          </div>
 
-      <div className="">
-        <div className="flex">
-          <div className="border rounded-xl my-4 p-4 w-1/3">
+          <div className="border rounded-xl p-4 h-13/16">
             <h1>Doa Governance Contract Page is here</h1>
-            <div>name: {content.name}</div>
-            <div>description: {content.description}</div>
             <div className="my-2">
               status :
               <span className="bg-green-700 ml-2 py-1 px-2 rounded-xl text-sm">
-                taking proposals
+                {status}
               </span>
             </div>
+            <div>{created}</div>
+            <div>{createdTime}</div>
             <button
               className="my-1 w-full border-2 p-1 rounded-xl border-stone-100/50 hover:border-stone-100"
-              onClick={() => setGovNav("governance")}
+              onClick={() => setGovNav("markdown")}
             >
               governance
             </button>
@@ -159,33 +209,42 @@ const DaoGovernance = ({ id }) => {
             </button>
             <div className="h-0.5 bg-stone-500 my-2"></div>
 
-            {proposals.map((proposal, index) => (
-              <button
-                key={index}
-                className="my-1 w-full border-2 p-1 rounded-xl border-stone-100/50 hover:border-stone-100"
-                onClick={() => {
-                  setContentUrl(proposal.content);
-                  setGovNav("current");
-                }}
-              >
-                Proposal id : {proposal.proposalId}
-              </button>
-            ))}
-          </div>
-
-          <div className="bg-stone-100 py-4 my-4 flex justify-center mx-2 p-4 w-full rounded-xl h-8/10 overflow-y-scroll">
-            {govNav === "governance" && (
-              <ReactMarkdown className="prose" remarkPlugins={[remarkGfm]}>
-                {content.content}
-              </ReactMarkdown>
-            )}
-            {govNav === "create" && <CreateProposal daoAddress={id} />}
-            {govNav === "current" && <ProposalDisplay url={contentUrl} />}
+            {proposals &&
+              proposals.map((proposal, index) => (
+                <button
+                  key={index}
+                  className="my-1 w-full border-2 p-1 rounded-xl border-stone-100/50 hover:border-stone-100"
+                  onClick={() => {
+                    console.log(proposal);
+                    setProposalId(proposal.proposalId);
+                    setContentUrl(proposal.content);
+                    setGovNav("markdown");
+                  }}
+                >
+                  Proposal id : {proposal.proposalId}
+                </button>
+              ))}
           </div>
         </div>
-        <div className="flex -mt-4">
-          <div className="w-1/3"></div>
-          <div className="w-2/3 bg-black">voting</div>
+        <div className="col-span-2">
+          <div className="bg-stone-100 h-13/16 p-4 rounded-xl overflow-y-scroll">
+            {govNav === "markdown" && <MarkdownDisplay url={contentUrl} />}
+            {govNav === "create" && <CreateProposal daoAddress={id} />}
+          </div>
+          <div className="w-full flex space-x-8 mt-4">
+            <button
+              className="w-full border-2 p-1 rounded-xl border-stone-100/50 hover:border-stone-100"
+              onClick={() => voteOnProposal(proposalId, "YES")}
+            >
+              Vote For
+            </button>
+            <button
+              className="w-full border-2 p-1 rounded-xl border-stone-100/50 hover:border-stone-100"
+              onClick={() => voteOnProposal(proposalId, "NO")}
+            >
+              Vote Against
+            </button>
+          </div>
         </div>
       </div>
     </div>

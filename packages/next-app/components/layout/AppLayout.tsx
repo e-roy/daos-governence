@@ -9,13 +9,13 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
     return (
       <main className="h-screen bg-stone-800 text-stone-100 overflow-hidden">
-        <header className="h-1/10">
+        <header className="h-1/12">
           <Header />
         </header>
 
-        <div className="flex-1 flex">
+        <div className="flex-1 flex h-14/16">
           <SidebarNav />
-          <div className="w-full h-9/10 sm:ml-8 -mt-4 px-4">{children}</div>
+          <div className="w-full sm:ml-8 px-4">{children}</div>
         </div>
       </main>
     );

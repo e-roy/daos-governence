@@ -12,9 +12,12 @@
     "@superfluid-finance/js-sdk": "^0.5.12",
     "@superfluid-finance/sdk-core": "^0.3.0",
     "@superfluid-finance/sdk-redux": "^0.2.0",
+    "@uiw/react-markdown-editor": "^4.0.2",
+    "@uiw/react-md-editor": "^3.12.1",
     "ethers": "^5.6.2",
     "ipfs-http-client": "54.0.2",
     "next": "12.1.4",
+    "next-remove-imports": "^1.0.6",
     "react": "18.0.0",
     "react-dom": "18.0.0",
     "react-hook-form": "^7.29.0",
@@ -37,5 +40,8 @@
     "postcss": "8.4.12",
     "tailwindcss": "3.0.23",
     "typescript": "4.6.2"
+  },
+  "resolutions": {
+    "@types/react": "17.0.41"
   }
 }

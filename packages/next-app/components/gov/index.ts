@@ -1,2 +1,3 @@
 export { CreateProposal } from "./CreateProposal";
-export { ProposalDisplay } from "./ProposalDisplay";
+export { MarkdownDisplay } from "./MarkdownDisplay";
+export { MarkdownEditorComponent } from "./MarkdownEditorComponent";

@@ -216,6 +216,19 @@
             },
             {
               "inputs": [],
+              "name": "_againstGovernanceVotes",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
               "name": "_content",
               "outputs": [
                 {
@@ -242,12 +255,90 @@
             },
             {
               "inputs": [],
+              "name": "_forGovernanceVotes",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "_governanceStatus",
+              "outputs": [
+                {
+                  "internalType": "string",
+                  "name": "",
+                  "type": "string"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
               "name": "_owner",
               "outputs": [
                 {
                   "internalType": "address",
                   "name": "",
                   "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "_timeCreated",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "_timeGovVoteEnd",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "_timeProposalSubmitEnd",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "_timeProposalVoteEnd",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
                 }
               ],
               "stateMutability": "view",
@@ -426,11 +517,6 @@
               "name": "proposals",
               "outputs": [
                 {
-                  "internalType": "uint256",
-                  "name": "nftTokenId",
-                  "type": "uint256"
-                },
-                {
                   "internalType": "string",
                   "name": "content",
                   "type": "string"
@@ -447,12 +533,22 @@
                 },
                 {
                   "internalType": "uint256",
-                  "name": "yesVotes",
+                  "name": "forProposalVotes",
                   "type": "uint256"
                 },
                 {
                   "internalType": "uint256",
-                  "name": "noVotes",
+                  "name": "againstProposalVotes",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "forProposalExecute",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "againstProposalExecute",
                   "type": "uint256"
                 },
                 {
@@ -603,6 +699,19 @@
                 }
               ],
               "name": "transferFrom",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "enum Governance.Vote",
+                  "name": "vote",
+                  "type": "uint8"
+                }
+              ],
+              "name": "voteOnGovernance",
               "outputs": [],
               "stateMutability": "nonpayable",
               "type": "function"
